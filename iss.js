@@ -1,15 +1,14 @@
 const request = require('request');
 
 const fetchMyIP = function(callback) {
-  request('https://api.ipify.org?format=json', (error, response, body) => {
+  request('https://api64.ipify.org?format=json', (error, response, body) => {
     if (error) {
       callback(error, null);
       return;
     }
 
     if (response.statusCode !== 200) {
-      const msg = `Status Code ${response.statusCode} when fetching IP. Response: ${body}`;
-      callback(Error(msg), null);
+      callback(Error(`Status Code ${response.statusCode} when fetching IP: ${body}`), null);
       return;
     }
 
@@ -19,25 +18,28 @@ const fetchMyIP = function(callback) {
 };
 
 const fetchCoordsByIP = function(ip, callback) {
-  request(`https://freegeoip.app/json/${ip}`, (error, response, body) => {
+  request(`https://ipvigilante.com/json/${ip}`, (error, response, body) => {
     if (error) {
       callback(error, null);
       return;
     }
 
     if (response.statusCode !== 200) {
-      const msg = `Status Code ${response.statusCode} when fetching coordinates. Response: ${body}`;
-      callback(Error(msg), null);
+      callback(Error(`Status Code ${response.statusCode} when fetching coordinates for IP: ${body}`), null);
       return;
     }
 
-    const { latitude, longitude } = JSON.parse(body);
-    callback(null, { latitude, longitude });
+    const data = JSON.parse(body).data;
+    const coords = {
+      latitude: data.latitude,
+      longitude: data.longitude
+    };
+    callback(null, coords);
   });
 };
 
 const fetchISSFlyOverTimes = function(coords, callback) {
-  const url = `http://api.open-notify.org/iss-pass.json?lat=${coords.latitude}&lon=${coords.longitude}`;
+  const url = `https://iss-flyover.herokuapp.com/json/?lat=${coords.latitude}&lon=${coords.longitude}`;
 
   request(url, (error, response, body) => {
     if (error) {
@@ -46,13 +48,12 @@ const fetchISSFlyOverTimes = function(coords, callback) {
     }
 
     if (response.statusCode !== 200) {
-      const msg = `Status Code ${response.statusCode} when fetching ISS flyovers. Response: ${body}`;
-      callback(Error(msg), null);
+      callback(Error(`Status Code ${response.statusCode} when fetching ISS flyover times: ${body}`), null);
       return;
     }
 
-    const flyovers = JSON.parse(body).response;
-    callback(null, flyovers);
+    const passes = JSON.parse(body).response;
+    callback(null, passes);
   });
 };
 
