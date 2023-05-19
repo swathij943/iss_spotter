@@ -1,9 +1,31 @@
-const { fetchMyIP } = require('./iss');
+const { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes } = require('./iss');
 
+// Fetch IP address
 fetchMyIP((error, ip) => {
   if (error) {
-    console.log('It did not work', error);
+    console.log("Error fetching IP address:", error);
     return;
   }
-  console.log('It worked! Returned IP:', ip);
+
+  console.log("IP address:", ip);
+
+  // Fetch geo coordinates
+  fetchCoordsByIP(ip, (error, coords) => {
+    if (error) {
+      console.log("Error fetching geo coordinates:", error);
+      return;
+    }
+
+    console.log("Geo coordinates:", coords);
+
+    // Fetch ISS flyovers
+    fetchISSFlyOverTimes(coords, (error, flyovers) => {
+      if (error) {
+        console.log("Error fetching ISS flyovers:", error);
+        return;
+      }
+
+      console.log("ISS flyovers:", flyovers);
+    });
+  });
 });
