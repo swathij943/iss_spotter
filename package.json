@@ -3,6 +3,7 @@
     "axios": "^1.4.0",
     "har-validator": "^5.1.5",
     "request": "^2.88.2",
+    "request-promise-native": "^1.0.9",
     "uuid": "^9.0.0"
   }
 }
